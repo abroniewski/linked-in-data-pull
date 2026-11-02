@@ -3,7 +3,7 @@
 
 Usage: python3 pull_changelog.py [--data-dir DIR]
 
-DIR (default: env LINKEDIN_FEED_DIR, else ~/linkedin-feed) holds the private state, outside this repo:
+DIR (default: LINKEDIN_OUTPUT_DIR from .env, see .env.example) holds all output, outside this repo:
   changelog/state.json        last processedAt
   changelog/events.jsonl      raw events, de-duplicated by id
   changelog/digest-YYYY-MM-DD.md   digest of NEW events only
@@ -12,6 +12,7 @@ Token lookup: see linkedin_token.py. Never prints the token.
 """
 import datetime as dt, json, os, sys, time, urllib.error, urllib.request
 
+import config
 from linkedin_token import find_token
 
 API = "https://api.linkedin.com/rest/"
@@ -21,7 +22,7 @@ def data_dir():
     args = sys.argv[1:]
     if "--data-dir" in args:
         return os.path.expanduser(args[args.index("--data-dir") + 1])
-    return os.path.expanduser(os.environ.get("LINKEDIN_FEED_DIR", "~/linkedin-feed"))
+    return config.output_dir()
 
 
 def call(url, token, method="GET", body=None):

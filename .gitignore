@@ -1,6 +1,7 @@
 # Secrets: never commit
 .env
 .env.*
+!.env.example
 *.env
 *.env.txt
 
@@ -19,3 +20,4 @@ __pycache__/
 *.pyc
 .DS_Store
 *.log
+output/

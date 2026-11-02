@@ -7,13 +7,11 @@
   <array>
     <string>__PYTHON__</string>
     <string>__REPO__/pull_changelog.py</string>
-    <string>--data-dir</string>
-    <string>__DATA_DIR__</string>
   </array>
   <key>WorkingDirectory</key><string>__REPO__</string>
   <key>StartCalendarInterval</key>
   <dict><key>Hour</key><integer>__HOUR__</integer><key>Minute</key><integer>__MINUTE__</integer></dict>
-  <key>StandardOutPath</key><string>__DATA_DIR__/changelog/launchd.log</string>
-  <key>StandardErrorPath</key><string>__DATA_DIR__/changelog/launchd.log</string>
+  <key>StandardOutPath</key><string>__LOG__</string>
+  <key>StandardErrorPath</key><string>__LOG__</string>
 </dict>
 </plist>
