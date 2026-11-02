@@ -1,11 +1,12 @@
 #!/bin/sh
 # Build ~/Applications/Agent Job Runner.app, the launcher that scheduled jobs go through (see README).
+# Compiles launchd/agent-job-runner.c with the Xcode command line tools (cc).
 set -eu
 HERE=$(cd "$(dirname "$0")" && pwd)
 APP=${APP:-$HOME/Applications/Agent Job Runner.app}
 mkdir -p "$APP/Contents/MacOS"
-cp "$HERE/agent-job-runner.sh" "$APP/Contents/MacOS/agent-job-runner"
-chmod 755 "$APP/Contents/MacOS/agent-job-runner"
+command -v cc >/dev/null 2>&1 || { echo "No C compiler: run xcode-select --install first." >&2; exit 1; }
+cc -O2 -Wall -o "$APP/Contents/MacOS/agent-job-runner" "$HERE/agent-job-runner.c"
 cat > "$APP/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

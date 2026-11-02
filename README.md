@@ -46,14 +46,14 @@ Files are overwritten in place on each run (keep history with your sync tool or 
 
 Scheduled jobs on macOS can't answer permission prompts, so they can't read a Google Drive folder on their own. Instead of giving Python Full Disk Access, the job goes through one small launcher app that holds the permission:
 
-    ./launchd/build-runner-app.sh           # builds ~/Applications/Agent Job Runner.app (ad-hoc signed)
+    ./launchd/build-runner-app.sh           # compiles and builds ~/Applications/Agent Job Runner.app (ad-hoc signed; needs the Xcode command line tools)
     open -W -a "$HOME/Applications/Agent Job Runner.app" --args "$PWD/launchd/run-changelog.sh"
                                             # permission test, run once in Terminal; click Allow if macOS asks
                                             # about files managed by Google Drive (if it asks for something else, see below)
     ./launchd/install.sh                    # daily 08:30
     LABEL=my.linkedin-changelog HOUR=7 MINUTE=0 ./launchd/install.sh
 
-The launcher only runs an executable script that sits inside `~/CODE_Repositories`, so it can't be used to run arbitrary commands. Its contract for any job: `open -W -a "<app>" --args <script> [args]`. The script gets no environment or working directory from launchd, so it must `cd` and redirect its own output (see `launchd/run-changelog.sh`).
+The launcher (`launchd/agent-job-runner.c`) only runs an executable script that sits inside `~/CODE_Repositories`, so it can't be used to run arbitrary commands. It starts `/bin/zsh SCRIPT ARGS` as a child and stays the parent until the job ends. Its contract for any job: `open -W -a "<app>" --args SCRIPT [ARGS]`. The script gets only the minimal environment macOS gives apps, no working directory, and no log redirection from launchd, so it must `cd`, set `PATH`/`USER` if it needs them, and redirect its own output (see `launchd/run-changelog.sh`).
 
 Needs `.env` first (the job reads `LINKEDIN_OUTPUT_DIR` from it). State, digests (`changelog/`) and the optional `companies.txt` live in the output folder. The log is `~/Library/Logs/<LABEL>.log`. If macOS never shows a Google Drive prompt and the test fails with "Operation not permitted", grant the app (not Python) Full Disk Access in System Settings > Privacy & Security.
 
