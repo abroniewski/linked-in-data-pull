@@ -25,6 +25,14 @@ def data_dir():
     return config.output_dir()
 
 
+def _private(path, mode):
+    """Tighten permissions where the filesystem allows it (cloud-synced folders such as Google Drive refuse chmod)."""
+    try:
+        os.chmod(path, mode)
+    except OSError:
+        pass
+
+
 def call(url, token, method="GET", body=None):
     req = urllib.request.Request(url, method=method, data=json.dumps(body).encode() if body is not None else None, headers={
         "Authorization": f"Bearer {token}", "Linkedin-Version": "202312",
@@ -105,7 +113,7 @@ def main():
     base = data_dir()
     out = os.path.join(base, "changelog")
     os.makedirs(out, exist_ok=True)
-    os.chmod(out, 0o700)
+    _private(out, 0o700)
     sp, ep = os.path.join(out, "state.json"), os.path.join(out, "events.jsonl")
     state = json.load(open(sp)) if os.path.exists(sp) else {}
     known = set()
@@ -151,7 +159,7 @@ def main():
         open(path, "a", encoding="utf-8").write("\n" + "\n".join(body) + "\n")
     else:
         open(path, "w", encoding="utf-8").write("\n".join(body) + "\n")
-    os.chmod(path, 0o600)
+    _private(path, 0o600)
     print(f"events fetched={len(events)} new={len(new)} messages={len(msgs)} invitations={len(invs)} company_mentions={len(hits)} -> {os.path.basename(path)}")
 
 
