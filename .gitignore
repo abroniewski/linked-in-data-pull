@@ -1,0 +1,21 @@
+# Secrets: never commit
+.env
+.env.*
+*.env
+*.env.txt
+
+# Personal LinkedIn data: never commit (other people's names and messages)
+linkedin-export/
+changelog/
+data/
+export/
+*.json
+*.jsonl
+*.csv
+companies.txt
+digest-*.md
+
+__pycache__/
+*.pyc
+.DS_Store
+*.log
