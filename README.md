@@ -6,6 +6,7 @@ Pull **your own** LinkedIn data through LinkedIn's Member Data Portability API, 
 |---|---|
 | `pull_linkedin.py` | Full snapshot: one JSON file per domain, for every domain LinkedIn documents (about 67: connections, inbox, invitations, jobs, profile, comments, likes, login history, ...), plus `_pull_report.json` with row counts per domain |
 | `pull_changelog.py` | New messages and invitations from the change-log feed, as a dated Markdown digest. Meant to run daily |
+| `DEPENDENCIES.md` | Who reads the output files, and what must not change without coordination |
 | `config.py`, `linkedin_token.py` | Settings (`.env`) and token lookup shared by both |
 
 ## Before you start
@@ -58,6 +59,15 @@ The launcher (`launchd/agent-job-runner.c`) only runs an executable script that 
 Needs `.env` first (the job reads `LINKEDIN_OUTPUT_DIR` from it). State, digests (`changelog/`) and the optional `companies.txt` live in the output folder. The log is `~/Library/Logs/<LABEL>.log`. If macOS never shows a Google Drive prompt and the test fails with "Operation not permitted", grant the app (not Python) Full Disk Access in System Settings > Privacy & Security.
 
 Remove it: `launchctl bootout gui/$(id -u)/local.linkedin-changelog && rm ~/Library/LaunchAgents/local.linkedin-changelog.plist`
+
+## Weekly full snapshot (macOS launchd)
+
+Keeps the full snapshot (all domains, including `CONNECTIONS.json` and `COMPANY_FOLLOWS.json`) fresh. Same launcher app and setup as above, a different job:
+
+    JOB=snapshot ./launchd/install.sh       # Sundays 05:30, label local.linkedin-snapshot, log ~/Library/Logs/local.linkedin-snapshot.log
+    launchctl kickstart -k gui/$(id -u)/local.linkedin-snapshot     # run it once now
+
+Override with `LABEL`, `HOUR`, `MINUTE`, `WEEKDAY` (0 = Sunday ... 6; `WEEKDAY=any` for every day). A run only rewrites files whose content changed. Other projects depend on these files: see DEPENDENCIES.md.
 
 ## License
 

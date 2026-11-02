@@ -72,10 +72,20 @@ def pull(domain, token):
 
 
 def write_json(path, obj):
+    """Write JSON atomically, and not at all if the file already holds exactly this content
+    (a sync client then sees no change, and Drive's version history is not filled with identical copies)."""
+    text = json.dumps(obj, indent=1, ensure_ascii=False)
+    try:
+        with open(path, encoding="utf-8") as f:
+            if f.read() == text:
+                return False
+    except OSError:
+        pass
     tmp = os.path.join(os.path.dirname(path), "." + os.path.basename(path) + ".tmp")  # replace atomically so a sync client never sees half a file
     with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(obj, f, indent=1, ensure_ascii=False)
+        f.write(text)
     os.replace(tmp, path)
+    return True
 
 
 def main():

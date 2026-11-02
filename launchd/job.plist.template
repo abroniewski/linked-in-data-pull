@@ -10,12 +10,12 @@
     <string>-a</string>
     <string>__APP__</string>
     <string>--args</string>
-    <string>__REPO__/launchd/run-changelog.sh</string>
+    <string>__REPO__/launchd/__WRAPPER__</string>
     <string>__LOG__</string>
   </array>
   <key>WorkingDirectory</key><string>__REPO__</string>
   <key>StartCalendarInterval</key>
-  <dict><key>Hour</key><integer>__HOUR__</integer><key>Minute</key><integer>__MINUTE__</integer></dict>
+  __INTERVAL__
   <key>StandardOutPath</key><string>__LOG__</string>
   <key>StandardErrorPath</key><string>__LOG__</string>
 </dict>
