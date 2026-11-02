@@ -5,8 +5,13 @@
   <key>Label</key><string>__LABEL__</string>
   <key>ProgramArguments</key>
   <array>
-    <string>__PYTHON__</string>
-    <string>__REPO__/pull_changelog.py</string>
+    <string>/usr/bin/open</string>
+    <string>-W</string>
+    <string>-a</string>
+    <string>__APP__</string>
+    <string>--args</string>
+    <string>__REPO__/launchd/run-changelog.sh</string>
+    <string>__LOG__</string>
   </array>
   <key>WorkingDirectory</key><string>__REPO__</string>
   <key>StartCalendarInterval</key>

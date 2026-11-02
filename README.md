@@ -44,10 +44,18 @@ Files are overwritten in place on each run (keep history with your sync tool or 
 
 ## Daily change-log digest (macOS launchd)
 
+Scheduled jobs on macOS can't answer permission prompts, so they can't read a Google Drive folder on their own. Instead of giving Python Full Disk Access, the job goes through one small launcher app that holds the permission:
+
+    ./launchd/build-runner-app.sh           # builds ~/Applications/Agent Job Runner.app (ad-hoc signed)
+    open -W -a "$HOME/Applications/Agent Job Runner.app" --args "$PWD/launchd/run-changelog.sh"
+                                            # permission test, run once in Terminal; click Allow if macOS asks
+                                            # about files managed by Google Drive (if it asks for something else, see below)
     ./launchd/install.sh                    # daily 08:30
     LABEL=my.linkedin-changelog HOUR=7 MINUTE=0 ./launchd/install.sh
 
-Needs `.env` first (the job reads `LINKEDIN_OUTPUT_DIR` from it). State, digests (`changelog/`) and the optional `companies.txt` (company names to flag, one per line) live in the output folder. The job log is `~/Library/Logs/<LABEL>.log`. macOS blocks launchd jobs from reading `~/Documents`, `~/Desktop` and `~/Downloads`; a cloud-synced folder may need the same permission, so check the log after the first scheduled run.
+The launcher only runs an executable script that sits inside `~/CODE_Repositories`, so it can't be used to run arbitrary commands. Its contract for any job: `open -W -a "<app>" --args <script> [args]`. The script gets no environment or working directory from launchd, so it must `cd` and redirect its own output (see `launchd/run-changelog.sh`).
+
+Needs `.env` first (the job reads `LINKEDIN_OUTPUT_DIR` from it). State, digests (`changelog/`) and the optional `companies.txt` live in the output folder. The log is `~/Library/Logs/<LABEL>.log`. If macOS never shows a Google Drive prompt and the test fails with "Operation not permitted", grant the app (not Python) Full Disk Access in System Settings > Privacy & Security.
 
 Remove it: `launchctl bootout gui/$(id -u)/local.linkedin-changelog && rm ~/Library/LaunchAgents/local.linkedin-changelog.plist`
 
